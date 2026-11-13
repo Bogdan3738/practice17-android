@@ -64,7 +64,9 @@ public class SignActivity extends Activity {
     protected String getLogin() { return LoginTextView.getText().toString().trim(); }
     protected String getPassword() { return PasswordTextView.getText().toString(); }
 
-    public void SignIn(View view) {
+    public void SignIn(View view) { SignIn(); }
+
+    public void SignIn() {
         if (requestInProgress) return;
         boolean loginValid = Transform.CheckField(LoginTextView);
         boolean passwordValid = Transform.CheckField(PasswordTextView);
@@ -131,7 +133,7 @@ public class SignActivity extends Activity {
         LoginTextView.setText(preferences.getString(UserStaticInfo.LOGIN, ""));
         PasswordTextView.setText(preferences.getString(UserStaticInfo.PASSWORD, ""));
         if (Transform.StringNotNull(getLogin()) && Transform.StringNotNull(getPassword())) {
-            SignIn(null);
+            SignIn();
         }
     }
 

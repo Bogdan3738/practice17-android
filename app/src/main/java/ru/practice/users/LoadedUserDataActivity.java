@@ -7,7 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.view.View;
-import android.view.animation.AnimationUtils;
+import android.media.MediaPlayer;
 import android.widget.TextView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,6 +24,7 @@ public class LoadedUserDataActivity extends Activity {
     private long startedAt;
     private boolean resumed;
     private boolean loading;
+    private MediaPlayer mPlayer;
     private final Runnable timeout = () -> showFailure(R.string.profile_load_failed);
     private final Runnable enterMain = () -> {
         if (!resumed || pendingUsers == null || isFinishing()) return;
@@ -37,12 +38,7 @@ public class LoadedUserDataActivity extends Activity {
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loaded_user_data);
-        Init();
         loadProfiles();
-    }
-    private void Init() {
-        findViewById(R.id.imageForLoaded).startAnimation(
-                AnimationUtils.loadAnimation(this, R.anim.logo_rotate_animation));
     }
     private void loadProfiles() {
         cancelRead();
@@ -116,14 +112,36 @@ public class LoadedUserDataActivity extends Activity {
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
         finish();
     }
+    @Override protected void onStart() {
+        super.onStart();
+        if (mPlayer == null) {
+            mPlayer = MediaPlayer.create(this, R.raw.noise);
+            if (mPlayer != null) {
+                mPlayer.setVolume(0.2f, 0.2f);
+                mPlayer.setLooping(true);
+                mPlayer.setOnErrorListener((player, what, extra) -> {
+                    if (mPlayer == player) releasePlayer();
+                    return true;
+                });
+            }
+        }
+        if (mPlayer != null) mPlayer.start();
+    }
+    private void releasePlayer() {
+        if (mPlayer != null) { mPlayer.release();mPlayer = null; }
+    }
+    @Override protected void onStop() {
+        releasePlayer();super.onStop();
+    }
     @Override protected void onResume() {
         super.onResume();resumed = true;scheduleEnter();
     }
     @Override protected void onPause() {
+        if (mPlayer != null && mPlayer.isPlaying()) mPlayer.pause();
         resumed = false;handler.removeCallbacks(enterMain);super.onPause();
     }
     @Override protected void onDestroy() {
-        cancelRead();handler.removeCallbacksAndMessages(null);super.onDestroy();
+        releasePlayer();cancelRead();handler.removeCallbacksAndMessages(null);super.onDestroy();
     }
     @Override public void onBackPressed() { Back(null); }
 }
