@@ -32,4 +32,11 @@
     <string name="UserExistMessage">Пользователь существует</string>
     <string name="required_field">Заполните поле</string>
     <string name="signOut">Выйти</string>
+    <string name="loading_users">Загружаем пользователей…</string>
+    <string name="profile_ready">Данные получены. Открываем список…</string>
+    <string name="loading_logo">Анимированный логотип приложения</string>
+    <string name="profile_load_failed">Не удалось загрузить данные. Повторите попытку.</string>
+    <string name="profile_missing">Профиль не найден. Войдите заново.</string>
+    <string name="retry">Повторить</string>
+    <string name="back_to_signin">Ко входу</string>
 </resources>

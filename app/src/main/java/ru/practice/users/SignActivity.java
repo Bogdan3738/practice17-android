@@ -24,7 +24,7 @@ public class SignActivity extends Activity {
     protected Button signInButton, signUpButton;
     protected EditText NewLoginTextView, NewPasswordTextView, NewNameTextView, NewAgeTextView, NewStateTextView;
     private TabHost tabHost;
-    protected String sessionLogin, sessionPassword;
+    protected String sessionLogin;
     private TextView messageTextView;
     private ProgressBar progress;
     protected boolean requestInProgress;
@@ -38,6 +38,7 @@ public class SignActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign);
         Init();
+        FirebaseConnection.getDatabase(this).getReference();
         CheckSignInInfo();
         if (savedInstanceState != null) tabHost.setCurrentTab(savedInstanceState.getInt("tab", 0));
     }
@@ -78,7 +79,6 @@ public class SignActivity extends Activity {
         }
         final String password = getPassword();
         sessionLogin = getLogin();
-        sessionPassword = password;
         beginRequest();
         DatabaseReference account = FirebaseConnection.getDatabase(this)
                 .getReference(UserStaticInfo.USERS_SIGN_IN_INFO).child(sessionLogin);
@@ -90,7 +90,7 @@ public class SignActivity extends Activity {
                 Object profile = snapshot.child(UserStaticInfo.PROFILE_ID).getValue();
                 if (storedPassword != null && profile != null
                         && password.equals(storedPassword.toString())) {
-                    goNext(profile.toString());
+                    goNext(profile.toString(), sessionLogin, password);
                 } else {
                     CantSignIn();
                 }
@@ -109,7 +109,7 @@ public class SignActivity extends Activity {
         signUpButton.setEnabled(false);
         progress.setVisibility(View.VISIBLE);
         messageTextView.setVisibility(View.GONE);
-        handler.postDelayed(timeout, 12000);
+        handler.postDelayed(timeout, 30000);
     }
     protected void finishRequest() {
         requestInProgress = false;
@@ -130,13 +130,16 @@ public class SignActivity extends Activity {
                 Transform.APP_PREFERENCES, MODE_PRIVATE);
         LoginTextView.setText(preferences.getString(UserStaticInfo.LOGIN, ""));
         PasswordTextView.setText(preferences.getString(UserStaticInfo.PASSWORD, ""));
+        if (Transform.StringNotNull(getLogin()) && Transform.StringNotNull(getPassword())) {
+            SignIn(null);
+        }
     }
 
-    protected void goNext(String profileId) {
+    protected void goNext(String profileId, String login, String password) {
         Transform.SaveUser(getSharedPreferences(Transform.APP_PREFERENCES, MODE_PRIVATE),
-                sessionLogin, sessionPassword);
+                login, password);
         UserStaticInfo.profileId = profileId;
-        startActivity(new Intent(this, MainActivity.class));
+        startActivity(new Intent(this, LoadedUserDataActivity.class));
         finish();
     }
     protected String getNewLogin() { return NewLoginTextView.getText().toString().trim(); }
@@ -162,7 +165,6 @@ public class SignActivity extends Activity {
             return;
         }
         sessionLogin = getNewLogin();
-        sessionPassword = getNewPassword();
         beginRequest();
         createNewUser();
     }
@@ -194,7 +196,7 @@ public class SignActivity extends Activity {
                 root.updateChildren(updates).addOnCompleteListener(task -> {
                     if (isFinishing() || isDestroyed()) return;
                     finishRequest();
-                    if (task.isSuccessful()) goNext(profileId);
+                    if (task.isSuccessful()) goNext(profileId, login, account.get(UserStaticInfo.PASSWORD).toString());
                     else showError(R.string.connection_error);
                 });
             }
