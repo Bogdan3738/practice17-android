@@ -27,4 +27,6 @@
     <string name="connection_error">Не удалось подключиться к базе. Проверьте соединение и повторите вход.</string>
     <string name="welcome_text">Войдите, чтобы открыть список пользователей</string>
     <string name="firebase_emulator_host" translatable="false">10.0.2.2</string>
+    <string name="signUp">Регистрация</string>
+    <string name="goSignUp">Зарегистрироваться</string>
 </resources>

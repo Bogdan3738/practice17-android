@@ -4,3 +4,7 @@ local.properties
 .idea/
 *.iml
 *.hprof
+.firebase/
+firebase-debug.log
+database-debug.log
+ui-debug.log
