@@ -63,8 +63,8 @@ public class SignActivity extends Activity {
 
     public void SignIn(View view) {
         if (requestInProgress) return;
-        boolean loginValid = Transform.StringNotNull(getLogin());
-        boolean passwordValid = Transform.StringNotNull(getPassword());
+        boolean loginValid = Transform.CheckField(LoginTextView);
+        boolean passwordValid = Transform.CheckField(PasswordTextView);
         if (!(loginValid & passwordValid)) {
             Transform.Vibrate(this);
             showError(R.string.NullParametersMessage);
@@ -134,11 +134,11 @@ public class SignActivity extends Activity {
 
     public void SignUp(View view) {
         if (requestInProgress) return;
-        boolean filled = Transform.StringNotNull(getNewLogin())
-                & Transform.StringNotNull(getNewPassword())
-                & Transform.StringNotNull(getNewName())
-                & Transform.StringNotNull(NewAgeTextView.getText().toString())
-                & Transform.StringNotNull(getNewState());
+        boolean filled = Transform.CheckField(NewLoginTextView)
+                & Transform.CheckField(NewPasswordTextView)
+                & Transform.CheckField(NewNameTextView)
+                & Transform.CheckField(NewAgeTextView)
+                & Transform.CheckField(NewStateTextView);
         if (!filled) {
             Transform.Vibrate(this);
             showError(R.string.NullParametersMessage);
@@ -165,14 +165,28 @@ public class SignActivity extends Activity {
         Map<String, Object> account = new HashMap<>();
         account.put(UserStaticInfo.PASSWORD, getNewPassword());
         account.put(UserStaticInfo.PROFILE_ID, profileId);
-        Map<String, Object> updates = new HashMap<>();
-        updates.put(UserStaticInfo.USERS_SIGN_IN_INFO + "/" + getNewLogin(), account);
-        updates.put(UserStaticInfo.USERS_PROFILE_INFO + "/" + profileId, profile);
-        root.updateChildren(updates).addOnCompleteListener(task -> {
-            if (isFinishing() || isDestroyed()) return;
-            finishRequest();
-            if (task.isSuccessful()) goNext(profileId);
-            else showError(R.string.connection_error);
+        final String login = getNewLogin();
+        root.child(UserStaticInfo.USERS_SIGN_IN_INFO).child(login)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override public void onDataChange(DataSnapshot snapshot) {
+                if (isFinishing() || isDestroyed()) return;
+                if (snapshot.child(UserStaticInfo.PASSWORD).exists()) {
+                    finishRequest();showError(R.string.UserExistMessage);return;
+                }
+                Map<String,Object> updates = new HashMap<>();
+                updates.put(UserStaticInfo.USERS_SIGN_IN_INFO + "/" + login, account);
+                updates.put(UserStaticInfo.USERS_PROFILE_INFO + "/" + profileId, profile);
+                root.updateChildren(updates).addOnCompleteListener(task -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    finishRequest();
+                    if (task.isSuccessful()) goNext(profileId);
+                    else showError(R.string.connection_error);
+                });
+            }
+            @Override public void onCancelled(DatabaseError error) {
+                if (isFinishing() || isDestroyed()) return;
+                finishRequest();showError(R.string.connection_error);
+            }
         });
     }
 

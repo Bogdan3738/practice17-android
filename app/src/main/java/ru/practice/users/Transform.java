@@ -27,4 +27,15 @@ public final class Transform {
             vibrator.vibrate(120);
         }
     }
+    public static boolean CheckField(android.widget.EditText field) {
+        boolean filled = StringNotNull(field.getText().toString());
+        if (!filled) {
+            field.setError(field.getContext().getString(R.string.required_field));
+            field.startAnimation(android.view.animation.AnimationUtils.loadAnimation(
+                    field.getContext(), R.anim.empty_field));
+        } else {
+            field.setError(null);
+        }
+        return filled;
+    }
 }
