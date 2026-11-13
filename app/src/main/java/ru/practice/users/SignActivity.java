@@ -24,6 +24,7 @@ public class SignActivity extends Activity {
     protected Button signInButton, signUpButton;
     protected EditText NewLoginTextView, NewPasswordTextView, NewNameTextView, NewAgeTextView, NewStateTextView;
     private TabHost tabHost;
+    protected String sessionLogin, sessionPassword;
     private TextView messageTextView;
     private ProgressBar progress;
     protected boolean requestInProgress;
@@ -37,6 +38,7 @@ public class SignActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign);
         Init();
+        CheckSignInInfo();
         if (savedInstanceState != null) tabHost.setCurrentTab(savedInstanceState.getInt("tab", 0));
     }
 
@@ -75,9 +77,11 @@ public class SignActivity extends Activity {
             return;
         }
         final String password = getPassword();
+        sessionLogin = getLogin();
+        sessionPassword = password;
         beginRequest();
         DatabaseReference account = FirebaseConnection.getDatabase(this)
-                .getReference(UserStaticInfo.USERS_SIGN_IN_INFO).child(getLogin());
+                .getReference(UserStaticInfo.USERS_SIGN_IN_INFO).child(sessionLogin);
         account.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override public void onDataChange(DataSnapshot snapshot) {
                 if (!requestInProgress || isFinishing() || isDestroyed()) return;
@@ -121,7 +125,16 @@ public class SignActivity extends Activity {
     }
     protected void CantSignIn() { showError(R.string.CantSignInMessage); }
 
+    protected void CheckSignInInfo() {
+        android.content.SharedPreferences preferences = getSharedPreferences(
+                Transform.APP_PREFERENCES, MODE_PRIVATE);
+        LoginTextView.setText(preferences.getString(UserStaticInfo.LOGIN, ""));
+        PasswordTextView.setText(preferences.getString(UserStaticInfo.PASSWORD, ""));
+    }
+
     protected void goNext(String profileId) {
+        Transform.SaveUser(getSharedPreferences(Transform.APP_PREFERENCES, MODE_PRIVATE),
+                sessionLogin, sessionPassword);
         UserStaticInfo.profileId = profileId;
         startActivity(new Intent(this, MainActivity.class));
         finish();
@@ -148,6 +161,8 @@ public class SignActivity extends Activity {
             showError(R.string.invalid_login);
             return;
         }
+        sessionLogin = getNewLogin();
+        sessionPassword = getNewPassword();
         beginRequest();
         createNewUser();
     }

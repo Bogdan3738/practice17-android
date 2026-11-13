@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Пользователи · Практика 16</string>
+    <string name="app_name">Пользователи 17</string>
     <string name="users_title">Пользователи</string>
     <string name="choose_user">Выберите пользователя</string>
     <string name="profile">Профиль пользователя</string>
@@ -31,4 +31,5 @@
     <string name="goSignUp">Зарегистрироваться</string>
     <string name="UserExistMessage">Пользователь существует</string>
     <string name="required_field">Заполните поле</string>
+    <string name="signOut">Выйти</string>
 </resources>

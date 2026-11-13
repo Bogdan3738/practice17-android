@@ -2,6 +2,7 @@ package ru.practice.users;
 
 /** Безопасное преобразование возраста: ошибочный ввод сохраняет прежнее значение. */
 public final class Transform {
+    public static final String APP_PREFERENCES = "settings";
     private Transform() { }
     public static int parseIntOrDefault(String whatParse, int defaultValue) {
         try {
@@ -37,5 +38,12 @@ public final class Transform {
             field.setError(null);
         }
         return filled;
+    }
+    public static void SaveUser(android.content.SharedPreferences preferences,
+                                String login, String password) {
+        preferences.edit()
+                .putString(UserStaticInfo.LOGIN, login)
+                .putString(UserStaticInfo.PASSWORD, password)
+                .apply();
     }
 }

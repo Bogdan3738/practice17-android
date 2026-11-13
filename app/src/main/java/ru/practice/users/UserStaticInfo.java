@@ -7,6 +7,7 @@ import java.util.List;
 public final class UserStaticInfo {
     public static final String USERS_SIGN_IN_INFO = "UsersSignInInfo";
     public static final String USERS_PROFILE_INFO = "UsersProfileInfo";
+    public static final String LOGIN = "login";
     public static final String PASSWORD = "password";
     public static final String PROFILE_ID = "profileId";
     public static final String NAME = "name";

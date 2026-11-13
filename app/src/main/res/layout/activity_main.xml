@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout android:background="#FFFFFF" xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent">
     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="20dp" android:text="@string/users_title" android:textSize="28sp" android:textStyle="bold" android:textColor="@color/black" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
+                <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:padding="16dp"
+                    android:text="@string/users_title" android:textSize="24sp" android:textStyle="bold" android:textColor="@color/black" />
+                <Button android:id="@+id/SignOutButton" android:layout_width="wrap_content" android:layout_height="48dp"
+                    android:layout_marginRight="12dp" android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:text="@string/signOut" android:textAllCaps="false" android:textColor="@color/accent" android:onClick="SignOut" />
+            </LinearLayout>
         <ListView android:id="@+id/listView" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:divider="@android:color/transparent" android:dividerHeight="0dp" />
     </LinearLayout>
     <include layout="@layout/profile_panel" />

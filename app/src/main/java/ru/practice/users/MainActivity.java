@@ -76,4 +76,12 @@ public class MainActivity extends Activity {
         if (positionActiveUser >= 0) BackToList(null);
         else super.onBackPressed();
     }
+    public void SignOut(View view) {
+        getSharedPreferences(Transform.APP_PREFERENCES, MODE_PRIVATE).edit().clear().apply();
+        UserStaticInfo.profileId = null;
+        Intent intent = new Intent(this, SignActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
 }
